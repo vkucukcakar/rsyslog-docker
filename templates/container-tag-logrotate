@@ -1,0 +1,50 @@
+###
+# vkucukcakar/rsyslog
+# rsyslog and logrotate Docker image with automatic configuration file creation and export
+# Copyright (c) 2017 Volkan Kucukcakar
+# 
+# This file is part of vkucukcakar/rsyslog.
+# 
+# vkucukcakar/rsyslog is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+# 
+# vkucukcakar/rsyslog is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+###
+# Container		: ${CONTAINER_NAME}
+# Real path		: /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate
+# Description	: ${_CONTAINER_LOG_TAG} logrotate include file. Edit to configure logrotate settings.
+# Note			: This file is automatically created by vkucukcakar/rsyslog image
+###
+
+### "${_CONTAINER_LOG_TAG}.log" logrotate ###
+/var/log/${_CONTAINER_LOG_TAG}.log {
+	daily
+	copytruncate
+	dateformat %Y-%m-%d.
+	dateext
+	extension log
+	olddir ./archive
+	missingok
+	rotate 30
+	compress 
+	delaycompress
+	notifempty
+	create 0640 root adm
+	sharedscripts
+	prerotate	
+	endscript
+	postrotate
+	endscript
+}

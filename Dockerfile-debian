@@ -1,0 +1,78 @@
+###
+# vkucukcakar/rsyslog
+# rsyslog and logrotate Docker image with automatic configuration file creation and export
+# Copyright (c) 2017 Volkan Kucukcakar
+# 
+# This file is part of vkucukcakar/rsyslog.
+# 
+# vkucukcakar/rsyslog is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+# 
+# vkucukcakar/rsyslog is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+FROM vkucukcakar/runit:debian
+
+LABEL maintainer "Volkan Kucukcakar"
+
+EXPOSE 5514 5514/udp
+
+VOLUME [ "/var/log", "/configurations" ]
+
+# Install cron, rsyslog, logrotate, netcat (for the nc command that will be used for healthcheck later), gettext-base (for envsubst command that will be required for entrypoint later)
+RUN apt-get update -q && apt-get install -y \
+    cron \
+    rsyslog \
+    logrotate
+
+# Note: netcat, gettext-base already installed on base image
+
+# Clean up the apt cache
+RUN rm -rf /var/lib/apt/lists/*
+    
+# Clear default cron directories, delete cron files except "logrotate" and ".placeholder" files using find command. 
+# rm -f also suspend errors even the directory is not found.
+RUN find /etc/cron.daily -type f ! -name '.placeholder' ! -name 'logrotate' -delete
+
+
+# Create logrotate cron and rsyslog runit services.
+RUN mkdir -p /etc/service/cron/ \
+    && mkdir -p /etc/service/rsyslog/
+COPY debian/logrotate-cron.run /etc/service/cron/run
+COPY common/rsyslog.run /etc/service/rsyslog/run
+RUN chmod 755 /etc/service/cron/run \
+    && chmod 755 /etc/service/rsyslog/run
+
+    
+# Disable default configuration file(s)
+RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak
+RUN mv /etc/logrotate.conf /etc/logrotate.conf.bak
+
+# Remove default rsyslog and logrotate configuration files
+#RUN rm /etc/rsyslog.d/*; exit 0
+RUN rm /etc/logrotate.d/*
+
+
+# Copy template configuration files
+COPY templates/rsyslog.conf /templates/rsyslog.conf
+COPY templates/logrotate.conf /templates/logrotate.conf
+COPY templates/container-tag-rsyslog.conf /templates/container-tag-rsyslog.conf
+COPY templates/container-tag-logrotate /templates/container-tag-logrotate
+    
+# Healthcheck with netcat    
+HEALTHCHECK --interval=10s --timeout=10s --retries=3 CMD nc -z localhost 5514 || exit 1
+    
+# Setup entrypoint
+COPY common/entrypoint.sh /rsyslog/entrypoint.sh
+RUN chmod +x /rsyslog/entrypoint.sh
+ENTRYPOINT ["/tini", "--", "/runit/entrypoint.sh", "/rsyslog/entrypoint.sh"]
