@@ -2,7 +2,7 @@
 
 rsyslog and logrotate Docker image with automatic configuration file creation and export
 
-* Brings plain text logging back to Docker with rsyslog with built-in logrotate.
+* Brings plain text logging to Docker with rsyslog and built-in logrotate.
 * For use with Docker's syslog logging driver
 * Auto create or use configuration files at volume "/configurations" using environment variables
 * Various logs are written to text files at volume "/var/log"
