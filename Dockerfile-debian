@@ -21,7 +21,7 @@
 # This copyright notice and license must be retained in all files and derivative works.
 ###
 
-FROM vkucukcakar/runit:debian
+FROM vkucukcakar/runit:1.0.0-debian
 
 LABEL maintainer "Volkan Kucukcakar"
 
