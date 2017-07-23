@@ -24,13 +24,14 @@
 ###
 
 # Create configuration files using environment variables if auto configuration is enabled and configuration files are not found
+# Symbolic links are then created from known configuration files at /configurations directory to their original locations
 if [ "$AUTO_CONFIGURE" == "enable" ]; then
 	echo "AUTO_CONFIGURE enabled, starting auto configuration."	
 	# Limit environment variables to substitute
 	SHELL_FORMAT='$CONTAINER_NAME,$_CONTAINER_LOG_TAG,$COMMON_TAG'
 	
 	# Check if the required environment variables are set and create configuration files
-	if [ ! -z "$CONTAINER_NAME" ] && [ ! -z "$COMMON_TAG" ] && [ ! -z "$CONTAINER_TAGS" ] && [[ $CONTAINER_TAGS =~ ^([[:alnum:]\._-]+[[:blank:]]*)+$ ]]; then
+	if [ "$CONTAINER_NAME" ] && [ "$COMMON_TAG" ] && [ "$CONTAINER_TAGS" ] && [[ $CONTAINER_TAGS =~ ^([[:alnum:]\._-]+[[:blank:]]*)+$ ]]; then
 		# Check if /configurations/rsyslog.conf configuration file already exists/mounted
 		if [ ! -f /configurations/rsyslog.conf ]; then
 			echo "Creating configuration file '/configurations/rsyslog.conf' from template."
@@ -85,15 +86,19 @@ if [ "$AUTO_CONFIGURE" == "enable" ]; then
 			
 			# Create symbolic links for configuration files
 			# Create symbolic link for configuration file '/configurations/${_CONTAINER_LOG_TAG}-rsyslog.conf' to real location
-			if [ -f /configurations/${_CONTAINER_LOG_TAG}-rsyslog.conf ] && [ ! -f /etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf ]; then
+			if [ ! -f /etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf ]; then
 				echo "Creating symbolic link for configuration file '/configurations/${_CONTAINER_LOG_TAG}-rsyslog.conf' to '/etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf'"
 				ln -s /configurations/${_CONTAINER_LOG_TAG}-rsyslog.conf /etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf
+			elif [ ! -L /etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf ]; then
+				echo "Warning: The file '/etc/rsyslog.d/${_CONTAINER_LOG_TAG}-rsyslog.conf' is not a symbolic link created by AUTO_CONFIGURE. You can delete the file if you want to create symbolic link on next startup."
 			fi
 			
 			# Create symbolic link for configuration file '/configurations/${_CONTAINER_LOG_TAG}-logrotate' to real location
-			if [ -f /configurations/${_CONTAINER_LOG_TAG}-logrotate ] && [ ! -f /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate ]; then
+			if [ ! -f /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate ]; then
 				echo "Creating symbolic link for configuration file '/configurations/${_CONTAINER_LOG_TAG}-logrotate' to '/etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate'"
 				ln -s /configurations/${_CONTAINER_LOG_TAG}-logrotate /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate
+			elif [ ! -L /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate ]; then
+				echo "Warning: The file '/etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate' is not a symbolic link created by AUTO_CONFIGURE. You can delete the file if you want to create symbolic link on next startup."
 			fi			
 		done
 	else
@@ -103,21 +108,27 @@ if [ "$AUTO_CONFIGURE" == "enable" ]; then
 	
 	# Create symbolic links for common configuration file(s)	
 	# Create symbolic link for configuration file '/configurations/rsyslog.conf' to real location
-	if [ -f /configurations/rsyslog.conf ] && [ ! -f /etc/rsyslog.conf ]; then
+	if [ ! -f /etc/rsyslog.conf ]; then
 		echo "Creating symbolic link for configuration file '/configurations/rsyslog.conf' to '/etc/rsyslog.conf'"
 		ln -s /configurations/rsyslog.conf /etc/rsyslog.conf
+	elif [ ! -L /etc/rsyslog.conf ]; then
+		echo "Warning: The file '/etc/rsyslog.conf' is not a symbolic link created by AUTO_CONFIGURE. You can delete the file if you want to create symbolic link on next startup."
 	fi
 
 	# Create symbolic link for configuration file '/configurations/logrotate.conf' to real location
-	if [ -f /configurations/logrotate.conf ] && [ ! -f /etc/logrotate.conf ]; then
+	if [ ! -f /etc/logrotate.conf ]; then
 		echo "Creating symbolic link for configuration file '/configurations/logrotate.conf' to '/etc/logrotate.conf'"
 		ln -s /configurations/logrotate.conf /etc/logrotate.conf
+	elif [ ! -L /etc/logrotate.conf ]; then
+		echo "Warning: The file '/etc/logrotate.conf' is not a symbolic link created by AUTO_CONFIGURE. You can delete the file if you want to create symbolic link on next startup."
 	fi
 
 	# Create symbolic link for configuration file '/configurations/${COMMON_TAG}-logrotate' to real location
-	if [ -f /configurations/${COMMON_TAG}-logrotate ] && [ ! -f /etc/logrotate.d/${COMMON_TAG}-logrotate ]; then
+	if [ ! -f /etc/logrotate.d/${COMMON_TAG}-logrotate ]; then
 		echo "Creating symbolic link for configuration file '/configurations/${COMMON_TAG}-logrotate' to '/etc/logrotate.d/${COMMON_TAG}-logrotate'"
 		ln -s /configurations/${COMMON_TAG}-logrotate /etc/logrotate.d/${COMMON_TAG}-logrotate
+	elif [ ! -L /etc/logrotate.d/${COMMON_TAG}-logrotate ]; then
+		echo "Warning: The file '/etc/logrotate.d/${COMMON_TAG}-logrotate' is not a symbolic link created by AUTO_CONFIGURE. You can delete the file if you want to create symbolic link on next startup."
 	fi
 	echo "AUTO_CONFIGURE completed."
 else
@@ -146,6 +157,7 @@ if [[ "$@" ]]; then
 	$@
 	EXITCODE=$?
 	if [[ $EXITCODE > 0 ]]; then 
+		echo "Error: $@ finished with exit code: $EXITCODE"
 		exit $EXITCODE
 	fi
 fi

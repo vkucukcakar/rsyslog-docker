@@ -4,7 +4,7 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
 
 * Brings plain text logging to Docker with rsyslog and built-in logrotate.
 * For use with Docker's syslog logging driver
-* Auto create or use configuration files at volume "/configurations" using environment variables
+* Automatic configuration creates well-commented configuration files using environment variables or use configuration files at volume "/configurations"
 * Various logs are written to text files at volume "/var/log"
 * Based on vkucukcakar/runit image for service supervision and zombie reaping
 * Alpine and Debian based images
@@ -19,11 +19,18 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
 ## Environment variables supported
 
 * AUTO_CONFIGURE=[enable|disable]
+	Enable automatic configuration file creation
+* CONTAINER_NAME=[my-rsyslog-container]
+	Current container name
+* COMMON_TAG=[server-common]
+	Log tag for common logs
+* CONTAINER_TAGS=["server-proxy example-com-web"]
+	Space separated container log tags
+	
+## Caveats
 
-* EXECUTABLES=[space separated filenames to give execute permission]
-
-* CONTAINER_NAME=[your-container-name]
-
-* COMMON_TAG=[log-tag-for-common-logs]
-
-* CONTAINER_TAGS=[space separated container log tags]
+* Automatic configuration, creates some configuration files using the supported environment variables 
+  unless they already exist at /configurations directory. These are well-commented basic configuration files
+  that you can edit according to your needs and make them persistent by mounting /configurations directory 
+  to a location on host. If you need to re-create them using the environment variables, then you need to 
+  delete the old ones. This is all by design.

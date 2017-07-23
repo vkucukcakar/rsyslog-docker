@@ -22,10 +22,10 @@
 ###
 
 ###
-# Container		: ${CONTAINER_NAME}
-# Real path		: /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate
-# Description	: ${_CONTAINER_LOG_TAG} logrotate include file. Edit to configure logrotate settings.
-# Note			: This file is automatically created by vkucukcakar/rsyslog image
+# Container     : ${CONTAINER_NAME}
+# Symbolic link : /etc/logrotate.d/${_CONTAINER_LOG_TAG}-logrotate
+# Description   : ${_CONTAINER_LOG_TAG} logrotate include file. Edit to configure logrotate settings.
+# Note          : This file is automatically created by vkucukcakar/rsyslog image
 ###
 
 ### "${_CONTAINER_LOG_TAG}.log" logrotate ###
