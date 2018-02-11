@@ -54,7 +54,7 @@ RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak \
     && mv /etc/logrotate.conf /etc/logrotate.conf.bak
 
 # Remove default rsyslog and logrotate configuration files
-RUN rm /etc/logrotate.d/* \
+RUN rm /etc/logrotate.d/*
     #&& rm /etc/rsyslog.d/*; exit 0
 
 # Create "/var/spool/rsyslog" directory (referred in the common rsyslog.conf) for Alpine
