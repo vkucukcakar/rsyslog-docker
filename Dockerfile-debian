@@ -21,7 +21,7 @@
 # This copyright notice and license must be retained in all files and derivative works.
 ###
 
-FROM vkucukcakar/runit:1.0.3-debian
+FROM vkucukcakar/runit:1.0.4-debian
 
 LABEL maintainer "Volkan Kucukcakar"
 
@@ -31,14 +31,12 @@ VOLUME [ "/var/log", "/configurations" ]
 
 # Install cron, rsyslog, logrotate, netcat (for the nc command that will be used for healthcheck later), gettext-base (for envsubst command that will be required for entrypoint later)
 RUN apt-get update -q && apt-get install -y \
-    cron \
-    rsyslog \
-    logrotate
+        cron \
+        rsyslog \
+        logrotate \
+    && rm -rf /var/lib/apt/lists/*
 
 # Note: netcat, gettext-base already installed on base image
-
-# Clean up the apt cache
-RUN rm -rf /var/lib/apt/lists/*
 
 # Clear default cron directories, delete cron files except "logrotate" and ".placeholder" files using find command.
 # rm -f also suspend errors even the directory is not found.
@@ -53,12 +51,12 @@ RUN chmod 755 /etc/service/cron/run \
     && chmod 755 /etc/service/rsyslog/run
 
 # Disable default configuration file(s)
-RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak
-RUN mv /etc/logrotate.conf /etc/logrotate.conf.bak
+RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak \
+    && mv /etc/logrotate.conf /etc/logrotate.conf.bak
 
 # Remove default rsyslog and logrotate configuration files
-#RUN rm /etc/rsyslog.d/*; exit 0
 RUN rm /etc/logrotate.d/*
+    #&& rm /etc/rsyslog.d/*; exit 0
 
 # Copy template configuration files
 COPY templates /templates

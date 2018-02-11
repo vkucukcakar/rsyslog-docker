@@ -21,7 +21,7 @@
 # This copyright notice and license must be retained in all files and derivative works.
 ###
 
-FROM vkucukcakar/runit:1.0.3-alpine
+FROM vkucukcakar/runit:1.0.4-alpine
 
 LABEL maintainer "Volkan Kucukcakar"
 
@@ -31,13 +31,11 @@ VOLUME [ "/var/log", "/configurations" ]
 
 # Install cron, rsyslog, logrotate, netcat (for the nc command that will be used for healthcheck later), gettext (for envsubst command that will be required for entrypoint later)
 RUN apk add --update \
-	rsyslog \
-	logrotate
+        rsyslog \
+        logrotate \
+    && rm -rf /var/cache/apk/*
 
 # Note: cron, netcat, gettext already installed on base image
-
-# Clean up the apk cache
-RUN rm -rf /var/cache/apk/*
 
 # Clear default cron directories, delete cron files except "logrotate" and ".placeholder" files using find command.
 # rm -f also suspend errors even the directory is not found.
@@ -52,12 +50,12 @@ RUN chmod 755 /etc/service/cron/run \
     && chmod 755 /etc/service/rsyslog/run
 
 # Disable default configuration file(s)
-RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak
-RUN mv /etc/logrotate.conf /etc/logrotate.conf.bak
+RUN mv /etc/rsyslog.conf /etc/rsyslog.conf.bak \
+    && mv /etc/logrotate.conf /etc/logrotate.conf.bak
 
 # Remove default rsyslog and logrotate configuration files
-#RUN rm /etc/rsyslog.d/*; exit 0
-RUN rm /etc/logrotate.d/*
+RUN rm /etc/logrotate.d/* \
+    #&& rm /etc/rsyslog.d/*; exit 0
 
 # Create "/var/spool/rsyslog" directory (referred in the common rsyslog.conf) for Alpine
 RUN mkdir -p /var/spool/rsyslog
