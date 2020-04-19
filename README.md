@@ -6,15 +6,14 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
 * For use with Docker's syslog logging driver
 * Automatic configuration creates well-commented configuration files using environment variables or use configuration files at volume "/configurations"
 * Various logs are written to text files at volume "/var/log"
-* Based on vkucukcakar/runit image for service supervision and zombie reaping
-* Alpine and Debian based images
+* Based on vkucukcakar/runit image for service supervision and zombie process reaping
+* Alpine based image
 
 (Note: The image's own logs are sent back to Docker, not written to text files.)
 
 ## Supported tags
 
 * alpine, latest
-* debian
 
 ## Environment variables supported
 
@@ -34,3 +33,11 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
   that you can edit according to your needs and make them persistent by mounting /configurations directory 
   to a location on host. If you need to re-create them using the environment variables, then you must
   delete the old ones. This is all by design.
+
+## Notice
+
+Support for Debian based image has reached it's end-of-life.
+Debian related file(s) were moved to "legacy" folder for documentary purposes.
+Sorry, but it's not easy for me to maintain both Alpine and Debian based images.
+
+If you really need the Debian based image, please use previous versions up to v1.0.4.
