@@ -36,7 +36,7 @@ if [ "$AUTO_CONFIGURE" == "enable" ]; then
 		CONTAINER_TAGS="${CONTAINER_TAGS} ${_ADD_CONTAINER_TAGS}"
 	fi
 	# Check if the required environment variables are set and create configuration files (Changed [[:blank:]] to [[:space:]] to match new lines come from CTAG_)
-	if [ "$CONTAINER_NAME" ] && [ "$COMMON_TAG" ] && [ "$CONTAINER_TAGS" ] && [[ $CONTAINER_TAGS =~ ^([[:alnum:]\._-]+[[:space:]]*)+$ ]]; then
+	if [ "$CONTAINER_NAME" ] && [ "$COMMON_TAG" ] && [ "$CONTAINER_TAGS" ] && [[ $CONTAINER_TAGS =~ ^([[:space:]]*[[:alnum:]\._-]+[[:space:]]*)+$ ]]; then
 		# Check if /configurations/rsyslog.conf configuration file already exists/mounted
 		if [ ! -f /configurations/rsyslog.conf ]; then
 			echo "Creating configuration file '/configurations/rsyslog.conf' from template."
