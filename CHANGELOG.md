@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.6
+
+- Added CTAG_ prefixed environment variable support
+
 ## v1.0.5
 
 - Upgraded parent image

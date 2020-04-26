@@ -25,6 +25,8 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
 	Log tag for common logs
 * CONTAINER_TAGS=["server-proxy example-com-web"]
 	Space separated container log tags
+* CTAG_example-com=["server-proxy example-com-web"]
+	Variables starting with CTAG_ prefix will be added to CONTAINER_TAGS (Added for flexibility in Compose)
 	
 ## Caveats
 
