@@ -21,7 +21,7 @@
 # This copyright notice and license must be retained in all files and derivative works.
 ###
 
-FROM vkucukcakar/runit:1.0.5-alpine
+FROM vkucukcakar/runit
 
 LABEL maintainer "Volkan Kucukcakar"
 

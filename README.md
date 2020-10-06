@@ -13,7 +13,8 @@ rsyslog and logrotate Docker image with automatic configuration file creation an
 
 ## Supported tags
 
-* alpine, latest
+* latest (Alpine based)
+* Some version based tags may be available, please see tags section on Docker Hub
 
 ## Environment variables supported
 
